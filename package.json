@@ -4,7 +4,7 @@
   "description": "MongoDB adapter for Achilles",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "istanbul cover _mocha"
   },
   "keywords": [
     "adapter",
@@ -16,7 +16,7 @@
   "author": "Hashan Punchihewa <hashan.punchihewa@gmail.com>",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "achilles": "~0.18.4",
+    "achilles": "~0.18.6",
     "mocha": "~1.21.4"
   },
   "dependencies": {

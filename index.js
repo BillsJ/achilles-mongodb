@@ -31,8 +31,6 @@ Connection.prototype.close = function() {
 function Model() {
 	achilles.Model.call(this);
 
-	this.define("saved", Boolean, {virtual:true});
-
 	if(!this.constructor.collection) {
 		this.constructor.collection = "PENDING";
 		this.constructor.collection = this.constructor.connection.get(this.constructor.name);
@@ -42,28 +40,58 @@ function Model() {
 util.inherits(Model, achilles.Model);
 
 Model.prototype.save = function(cb) {
-	this.constructor.collection.then((function(collection) {
-		if(!this.saved) {
-			collection.insert(this.toJSON(), (function(err, doc) {
-				if(err) {
-					cb(err);
+	if(this.constructor.connection) {
+		this.constructor.collection.then((function(collection) {
+			collection.save(this.toJSON(), {w:1}, (function(err, record) {
+				if(record._id !== this._id) {
+					this._id = record._id;
 				}
-				this._id = doc._id;
-				cb(null, this);
+				if(cb) {
+					cb(err, this);
+				}
 			}).bind(this));
+		}).bind(this));
+	} else {
+		var str = this.getURL().split("/").slice(1).join(".");
+		var container = this;
+		while(container.container) {
+			container = container.container;
 		}
-	}).bind(this));
+		var resp = new Object();
+		resp[str] = this.toJSON();
+		if(this._id) {
+			container.constructor.collection.then(function(collection) {
+				collection.update({_id: container._id}, {$set: resp}, function(err, doc) {
+					cb(err, this);
+				});
+			}.bind(this));
+		} else {
+			container.constructor.collection.then(function(collection) {
+				collection.update({_id: container._id}, {$push: resp}, function(err, doc) {
+					if(err) {
+						cb(err);
+					} else {
+						this._id = this.container.length - 1;
+						cb(err, this);
+					}
+				}.bind(this));
+			}.bind(this));
+		}
+	}
 };
 
-Model.getById = function(id, cb) {
-	this.collection.then((function(collection) {
-		collection.findOne({_id:id}, (function(err, doc) {
+Model.prototype.refresh = function(cb) {
+	this.constructor.collection.then((function(collection) {
+		collection.findOne({_id:this._id}, function(err, doc) {
 			if(err) {
 				cb(err);
 			} else {
-				cb(null, this.parse(doc));
+				for(var key in doc) {
+					this[key] = doc[key];
+				}
+				cb(null, this);
 			}
-		}).bind(this));
+		}.bind(this));
 	}).bind(this));
 };
 
