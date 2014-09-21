@@ -90,5 +90,33 @@ Model.prototype.refresh = function(cb) {
 	}).bind(this));
 };
 
+Model.prototype.del = function(cb) {
+	if(!this.container) {
+		this.constructor.collection.then(function(collection) {
+			collection.remove({_id: new mongodb.ObjectID(this._id)}, function(err) {
+				cb(err, this);
+			});
+		}.bind(this));
+	} else {
+		var str = "";
+		var container = this.container;
+		while(container.container) {
+			if(container.container instanceof Array) {
+				str = container.container.indexOf(container) + (str ? "." + str : "");
+				container = container.container;
+			}
+			str = container.containerProp + (str ? "." + str : "");
+			container = container.container;
+		}
+		var resp = new Object();
+		resp[str] = {_id: this._id};
+		container.constructor.collection.then(function(collection) {
+			collection.update({_id: new mongodb.ObjectID(container._id)}, {$pull: resp}, function(err) {
+				cb(err, this);
+			}.bind(this));
+		}.bind(this));
+	}
+};
+
 module.exports.Model = Model;
 module.exports.Connection = Connection;

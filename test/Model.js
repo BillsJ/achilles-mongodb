@@ -84,4 +84,23 @@ describe("mongodb.Model", function() {
 			});
 		});
 	});
+	it("should support deleting subdocs", function(cb) {
+		var album = new Album();
+		album.title = "Who cares? 2";
+		album.rating = 2;
+		var song = new Song();
+		song.title = "WFSD";
+		album.songs = [song];
+		album.save(function(err) {
+			assert(err === null);
+			song.del(function(err) {
+				assert(err === null);
+				Album.getById(album._id, function(err, doc) {
+					assert(err === null);
+					assert(doc.songs.length === 0);
+					cb();
+				});
+			});
+		});
+	});
 });
