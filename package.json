@@ -16,12 +16,13 @@
   "author": "Hashan Punchihewa <hashan.punchihewa@gmail.com>",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "achilles": "~0.18.6",
+    "achilles": "~0.18.8",
     "mocha": "~1.21.4"
   },
   "dependencies": {
     "mongodb": "~1.4.9",
     "mongodb-promise": "0.0.4",
-    "rsvp": "~3.0.13"
+    "rsvp": "~3.0.13",
+    "achilles": "~0.18.7"
   }
 }

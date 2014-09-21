@@ -1,11 +1,13 @@
 var mongodb = require("../");
 var util = require("util");
+var Song = require("./Song");
 
 function Album() {
 	mongodb.Model.call(this);
 
 	this.define("title", String);
 	this.define("rating", Number);
+	this.define("songs", [Song]);
 }
 
 util.inherits(Album, mongodb.Model);

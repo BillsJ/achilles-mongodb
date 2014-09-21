@@ -31,7 +31,7 @@ Connection.prototype.close = function() {
 function Model() {
 	achilles.Model.call(this);
 
-	if(!this.constructor.collection) {
+	if(!this.constructor.collection && this.constructor.connection) {
 		this.constructor.collection = "PENDING";
 		this.constructor.collection = this.constructor.connection.get(this.constructor.name);
 	}
@@ -52,39 +52,34 @@ Model.prototype.save = function(cb) {
 			}).bind(this));
 		}).bind(this));
 	} else {
-		var str = this.getURL().split("/").slice(1).join(".");
+		var str = "";
 		var container = this;
 		while(container.container) {
+			if(container.container instanceof Array) {
+				str = container.container.indexOf(container) + (str ? "." + str : "");
+				container = container.container;
+			}
+			str = container.containerProp + (str ? "." + str : "");
 			container = container.container;
 		}
 		var resp = new Object();
 		resp[str] = this.toJSON();
-		if(this._id) {
-			container.constructor.collection.then(function(collection) {
-				collection.update({_id: container._id}, {$set: resp}, function(err, doc) {
-					cb(err, this);
-				});
-			}.bind(this));
-		} else {
-			container.constructor.collection.then(function(collection) {
-				collection.update({_id: container._id}, {$push: resp}, function(err, doc) {
-					if(err) {
-						cb(err);
-					} else {
-						this._id = this.container.length - 1;
-						cb(err, this);
-					}
-				}.bind(this));
-			}.bind(this));
-		}
+		container.constructor.collection.then(function(collection) {
+			collection.update({_id: new mongodb.ObjectID(container._id)}, {$set: resp}, function(err, doc) {
+				cb(err, this);
+			});
+		}.bind(this));
 	}
 };
 
 Model.prototype.refresh = function(cb) {
+	var id = mongodb.ObjectID(this._id);
 	this.constructor.collection.then((function(collection) {
-		collection.findOne({_id:this._id}, function(err, doc) {
+		collection.findOne({_id:id}, function(err, doc) {
 			if(err) {
 				cb(err);
+			} else if(!doc) {
+				throw "Document not found";
 			} else {
 				for(var key in doc) {
 					this[key] = doc[key];
