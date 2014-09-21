@@ -1,9 +1,9 @@
 {
   "name": "achilles-mongodb",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "MongoDB adapter for Achilles",
   "main": "index.js",
-	"browser":"browser.js",
+  "browser": "browser.js",
   "scripts": {
     "test": "istanbul cover _mocha"
   },
