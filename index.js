@@ -14,17 +14,6 @@ function Connection(url) {
 	});
 }
 
-function Container(container, str) {
-	while(container.container) {
-			if(container.container instanceof Array) {
-				str = container.container.indexOf(container) + (str ? "." + str : "");
-				container = container.container;
-			}
-			str = container.containerProp + (str ? "." + str : "");
-			container = container.container;
-		}
-}
-
 Connection.prototype.setup = function(collectionName) {
 	return new rsvp.Promise(function(resolve, reject) {
 		this.db.then(function(db) {
@@ -54,7 +43,14 @@ Connection.prototype.save = function(cb) {
 	} else {
 		var str = "";
 		var container = this;
-		Container;
+		while(container.container) {
+			if(container.container instanceof Array) {
+				str = container.container.indexOf(container) + (str ? "." + str : "");
+				container = container.container;
+			}
+			str = container.containerProp + (str ? "." + str : "");
+			container = container.container;
+		}
 		var resp = {};
 		resp[str] = this.toJSON();
 		container.constructor.collection.then(function(collection) {
