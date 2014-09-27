@@ -1,25 +1,25 @@
-var achilles = require("achilles");
+//var achilles = require("achilles");
 var mongodb = require("mongodb");
-var util = require("util");
+//var util = require("util");
 var rsvp = require("rsvp");
 
 function Connection(url) {
 	this.db = new rsvp.Promise(function(resolve, reject) {
-		mongodb.MongoClient.connect(url, (function(err, db) {
+		mongodb.MongoClient.connect(url, function(err, db) {
 			if(err) {
 				return reject(err);
 			}
 			resolve(db);
-		}).bind(this));
+		}.bind(this));
 	});
-};
+}
 
 Connection.prototype.setup = function(collectionName) {
-	return new rsvp.Promise((function(resolve, reject) {
+	return new rsvp.Promise(function(resolve, reject) {
 		this.db.then(function(db) {
 			resolve(db.collection(collectionName));
 		}, reject);
-	}).bind(this));
+	}.bind(this));
 };
 
 Connection.prototype.close = function() {
@@ -30,16 +30,16 @@ Connection.prototype.close = function() {
 
 Connection.prototype.save = function(cb) {
 	if(this.constructor.connection) {
-		this.constructor.collection.then((function(collection) {
-			collection.save(this.toJSON(), {w:1}, (function(err, record) {
+		this.constructor.collection.then(function(collection) {
+			collection.save(this.toJSON(), {w:1}, function(err, record) {
 				if(record._id !== this._id) {
 					this._id = record._id;
 				}
 				if(cb) {
 					cb(err, this);
 				}
-			}).bind(this));
-		}).bind(this));
+			}.bind(this));
+		}.bind(this));
 	} else {
 		var str = "";
 		var container = this;
@@ -51,10 +51,10 @@ Connection.prototype.save = function(cb) {
 			str = container.containerProp + (str ? "." + str : "");
 			container = container.container;
 		}
-		var resp = new Object();
+		var resp = {};
 		resp[str] = this.toJSON();
 		container.constructor.collection.then(function(collection) {
-			collection.update({_id: new mongodb.ObjectID(container._id)}, {$set: resp}, function(err, doc) {
+			collection.update({_id: new mongodb.ObjectID(container._id)}, {$set: resp}, function(err) {
 				cb(err, this);
 			});
 		}.bind(this));
@@ -63,7 +63,7 @@ Connection.prototype.save = function(cb) {
 
 Connection.prototype.refresh = function(cb) {
 	var id = mongodb.ObjectID(this._id);
-	this.constructor.collection.then((function(collection) {
+	this.constructor.collection.then(function(collection) {
 		collection.findOne({_id:id}, function(err, doc) {
 			if(err) {
 				cb(err);
@@ -71,12 +71,14 @@ Connection.prototype.refresh = function(cb) {
 				throw "Document not found";
 			} else {
 				for(var key in doc) {
-					this[key] = doc[key];
+					if (doc.hasOwnProperty(key)) {
+						this[key] = doc[key];
+					}
 				}
 				cb(null, this);
 			}
 		}.bind(this));
-	}).bind(this));
+	}.bind(this));
 };
 
 Connection.prototype.del = function(cb) {
@@ -97,7 +99,7 @@ Connection.prototype.del = function(cb) {
 			str = container.containerProp + (str ? "." + str : "");
 			container = container.container;
 		}
-		var resp = new Object();
+		var resp = {};
 		resp[str] = {_id: this._id};
 		container.constructor.collection.then(function(collection) {
 			collection.update({_id: new mongodb.ObjectID(container._id)}, {$pull: resp}, function(err) {
