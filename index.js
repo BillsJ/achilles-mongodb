@@ -14,7 +14,7 @@ function Connection(url) {
 	});
 };
 
-Connection.prototype.get = function(collectionName) {
+Connection.prototype.setup = function(collectionName) {
 	return new rsvp.Promise((function(resolve, reject) {
 		this.db.then(function(db) {
 			resolve(db.collection(collectionName));
@@ -28,18 +28,7 @@ Connection.prototype.close = function() {
 	});
 };
 
-function Model() {
-	achilles.Model.call(this);
-
-	if(!this.constructor.collection && this.constructor.connection) {
-		this.constructor.collection = "PENDING";
-		this.constructor.collection = this.constructor.connection.get(this.constructor.name);
-	}
-};
-
-util.inherits(Model, achilles.Model);
-
-Model.prototype.save = function(cb) {
+Connection.prototype.save = function(cb) {
 	if(this.constructor.connection) {
 		this.constructor.collection.then((function(collection) {
 			collection.save(this.toJSON(), {w:1}, (function(err, record) {
@@ -72,7 +61,7 @@ Model.prototype.save = function(cb) {
 	}
 };
 
-Model.prototype.refresh = function(cb) {
+Connection.prototype.refresh = function(cb) {
 	var id = mongodb.ObjectID(this._id);
 	this.constructor.collection.then((function(collection) {
 		collection.findOne({_id:id}, function(err, doc) {
@@ -90,7 +79,7 @@ Model.prototype.refresh = function(cb) {
 	}).bind(this));
 };
 
-Model.prototype.del = function(cb) {
+Connection.prototype.del = function(cb) {
 	if(!this.container) {
 		this.constructor.collection.then(function(collection) {
 			collection.remove({_id: new mongodb.ObjectID(this._id)}, function(err) {
@@ -118,5 +107,4 @@ Model.prototype.del = function(cb) {
 	}
 };
 
-module.exports.Model = Model;
 module.exports.Connection = Connection;

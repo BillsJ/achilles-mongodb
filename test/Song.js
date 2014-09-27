@@ -1,12 +1,12 @@
-var mongodb = require("../");
+var achilles = require("achilles");
 var util = require("util");
 
 function Song() {
-	mongodb.Model.call(this);
+	achilles.Model.call(this);
 	
 	this.define("title", String);
 }
 
-util.inherits(Song, mongodb.Model);
+util.inherits(Song, achilles.Model);
 
 module.exports = Song;

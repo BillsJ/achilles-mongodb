@@ -2,7 +2,7 @@ var Album = require("./Album");
 var Song = require("./Song");
 var assert = require("assert");
 
-describe("mongodb.Model", function() {
+describe("achilles.Model", function() {
 	it(".save()", function(done) {
 		var album = new Album();
 		album.title = "Whenever";
@@ -58,6 +58,7 @@ describe("mongodb.Model", function() {
 			assert(err === null);
 			doc.songs[0].title = "Hate";
 			doc.songs[0].save(function(err) {
+				assert(err === null);
 				Album.getById(doc._id, function(err, doc) {
 					assert(err === null);
 					assert(doc.songs[0].title === "Hate");

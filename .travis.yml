@@ -4,6 +4,11 @@ node_js:
 before_install: npm install -g istanbul codeclimate-test-reporter
 services:
   - mongodb
+addons:
+  code_climate:
+    repo_token: 5b51beab79fe71502b55863bf33878bf5fd061908361050d2f10ff2554cac9f2
+after_script:
+  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && cat coverage/lcov.info | codeclimate'
 deploy:
   provider: npm
   email: "hashan.punchihewa@gmail.com"
