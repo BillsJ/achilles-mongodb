@@ -10,7 +10,7 @@
   "keywords": [
     "adapter",
     "achilles",
-    "couchdb",
+    "mongodb",
     "database",
     "db"
   ],
