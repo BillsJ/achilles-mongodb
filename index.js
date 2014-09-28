@@ -14,6 +14,23 @@ function Connection(url) {
 	});
 };
 
+Connection.prototype.get = function(options, cb) {
+	this.collection.then(function(collection) {
+		collection.find(options.where, {
+			limit:options.limit,
+			skip:options.skip,
+			sort:options.sort
+		},
+		function(err, doc) {
+			if(err) {
+				cb(err);
+			} else {
+				cb(null, new this(doc));
+			}
+		}.bind(this));
+	}.bind(this));
+};
+
 Connection.prototype.setup = function(collectionName) {
 	return new rsvp.Promise((function(resolve, reject) {
 		this.db.then(function(db) {
