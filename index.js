@@ -12,7 +12,7 @@ function Connection(url) {
 			resolve(db);
 		}).bind(this));
 	});
-};
+}
 
 Connection.prototype.get = function(options, cb) {
 	this.collection.then(function(collection) {
@@ -21,11 +21,18 @@ Connection.prototype.get = function(options, cb) {
 			skip:options.skip,
 			sort:options.sort
 		},
-		function(err, doc) {
+		function(err, docs) {
 			if(err) {
 				cb(err);
 			} else {
-				cb(null, new this(doc));
+				docs.toArray(function(err, docs) {
+					docs = docs.map(function(doc) {
+						var y= new this();
+						y._data = doc;
+						return y;
+					}.bind(this));
+					cb(null, docs);
+				}.bind(this));
 			}
 		}.bind(this));
 	}.bind(this));
