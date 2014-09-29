@@ -13,6 +13,33 @@ function Connection(url) {
 		}.bind(this));
 	});
 }
+<<<<<<< HEAD
+=======
+
+Connection.prototype.get = function(options, cb) {
+	this.collection.then(function(collection) {
+		collection.find(options.where, {
+			limit:options.limit,
+			skip:options.skip,
+			sort:options.sort
+		},
+		function(err, docs) {
+			if(err) {
+				cb(err);
+			} else {
+				docs.toArray(function(err, docs) {
+					docs = docs.map(function(doc) {
+						var y= new this();
+						y._data = doc;
+						return y;
+					}.bind(this));
+					cb(null, docs);
+				}.bind(this));
+			}
+		}.bind(this));
+	}.bind(this));
+};
+>>>>>>> ca56bce917a4284309a4631f2c71ec9387dee1f7
 
 Connection.prototype.setup = function(collectionName) {
 	return new rsvp.Promise(function(resolve, reject) {
