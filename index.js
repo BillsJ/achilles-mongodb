@@ -13,8 +13,6 @@ function Connection(url) {
 		}.bind(this));
 	});
 }
-<<<<<<< HEAD
-=======
 
 Connection.prototype.get = function(options, cb) {
 	this.collection.then(function(collection) {
@@ -39,7 +37,6 @@ Connection.prototype.get = function(options, cb) {
 		}.bind(this));
 	}.bind(this));
 };
->>>>>>> ca56bce917a4284309a4631f2c71ec9387dee1f7
 
 Connection.prototype.setup = function(collectionName) {
 	return new rsvp.Promise(function(resolve, reject) {
