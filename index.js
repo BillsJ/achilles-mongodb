@@ -21,7 +21,7 @@ Connection.prototype.get = function(options, cb) {
 		options = {};
 		options.where = {};
 	}
-	var stream = new stream.PassThrough();
+	var str = new stream.PassThrough({objectMode:true});
 	this.collection.then(function(collection) {
 		collection.find(options.where, {
 			limit:options.limit,
@@ -41,12 +41,12 @@ Connection.prototype.get = function(options, cb) {
 						}.bind(this));
 						cb(null, docs);
 					}.bind(this));
-				} 
-				docs.stream().pipe(stream);
+				}
+				docs.stream().pipe(str);
 			}
 		}.bind(this));
 	}.bind(this));
-	return stream;
+	return str;
 };
 
 Connection.prototype.setup = function(collectionName) {
