@@ -2,6 +2,7 @@ var achilles = require("achilles");
 var mongodb = require("mongodb");
 var util = require("util");
 var rsvp = require("rsvp");
+var stream = require("stream");
 
 function Connection(url) {
 	this.db = new rsvp.Promise(function(resolve, reject) {
@@ -15,6 +16,12 @@ function Connection(url) {
 }
 
 Connection.prototype.get = function(options, cb) {
+	if(typeof options === "function") {
+		cb = options;
+		options = {};
+		options.where = {};
+	}
+	var stream = new stream.PassThrough();
 	this.collection.then(function(collection) {
 		collection.find(options.where, {
 			limit:options.limit,
@@ -25,17 +32,21 @@ Connection.prototype.get = function(options, cb) {
 			if(err) {
 				cb(err);
 			} else {
-				docs.toArray(function(err, docs) {
-					docs = docs.map(function(doc) {
-						var y= new this();
-						y._data = doc;
-						return y;
+				if(cb) {
+					docs.toArray(function(err, docs) {
+						docs = docs.map(function(doc) {
+							var y= new this();
+							y._data = doc;
+							return y;
+						}.bind(this));
+						cb(null, docs);
 					}.bind(this));
-					cb(null, docs);
-				}.bind(this));
+				} 
+				docs.stream().pipe(stream);
 			}
 		}.bind(this));
 	}.bind(this));
+	return stream;
 };
 
 Connection.prototype.setup = function(collectionName) {
