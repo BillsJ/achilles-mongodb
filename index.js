@@ -14,8 +14,17 @@ function Connection(url) {
 		}.bind(this));
 	});
 }
-<<<<<<< HEAD
-=======
+
+function Containers(container, str) {
+	while(container.container) {
+			if(container.container instanceof Array) {
+				str = container.container.indexOf(container) + (str ? "." + str : "");
+				container = container.container;
+			}
+			str = container.containerProp + (str ? "." + str : "");
+			container = container.container;
+		}
+}
 
 Connection.prototype.get = function(options, cb) {
 	if(typeof options === "function") {
@@ -50,7 +59,6 @@ Connection.prototype.get = function(options, cb) {
 	}.bind(this));
 	return str;
 };
->>>>>>> ca56bce917a4284309a4631f2c71ec9387dee1f7
 
 Connection.prototype.setup = function(collectionName) {
 	return new rsvp.Promise(function(resolve, reject) {
@@ -81,14 +89,7 @@ Connection.prototype.save = function(cb) {
 	} else {
 		var str = "";
 		var container = this;
-		while(container.container) {
-			if(container.container instanceof Array) {
-				str = container.container.indexOf(container) + (str ? "." + str : "");
-				container = container.container;
-			}
-			str = container.containerProp + (str ? "." + str : "");
-			container = container.container;
-		}
+		new Containers();
 		var resp = {};
 		resp[str] = this.toJSON();
 		container.constructor.collection.then(function(collection) {
@@ -129,14 +130,7 @@ Connection.prototype.del = function(cb) {
 	} else {
 		var str = "";
 		var container = this.container;
-		while(container.container) {
-			if(container.container instanceof Array) {
-				str = container.container.indexOf(container) + (str ? "." + str : "");
-				container = container.container;
-			}
-			str = container.containerProp + (str ? "." + str : "");
-			container = container.container;
-		}
+		new Containers();
 		var resp = {};
 		resp[str] = {_id: this._id};
 		container.constructor.collection.then(function(collection) {
