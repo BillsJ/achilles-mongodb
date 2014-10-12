@@ -17,4 +17,4 @@ deploy:
   on:
     tags: true
     repo: TheMuses/achilles-mongodb
-	all_branches: true
+    all_branches: true
