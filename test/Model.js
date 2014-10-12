@@ -79,6 +79,7 @@ describe("achilles.Model", function() {
 			song.save(function(err) {
 				Album.getById(album._id, function(err, doc) {
 					assert(err === null);
+					console.log(doc.songs[0]);
 					assert(doc.songs.length === 1);
 					cb();
 				});
