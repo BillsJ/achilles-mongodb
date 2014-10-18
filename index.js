@@ -88,17 +88,6 @@ Connection.prototype.save = function(cb) {
 		}.bind(this));
 	} else {
 		var str = "";
-<<<<<<< HEAD
-		var container = this;
-		new Containers();
-		var resp = {};
-		resp[str] = this.toJSON();
-		container.constructor.collection.then(function(collection) {
-			collection.update({_id: new mongodb.ObjectID(container._id)}, {$set: resp}, function(err) {
-				cb(err, this);
-			});
-		}.bind(this));
-=======
 		if(this._id) {
 			var container = this;
 			while(container.container) {
@@ -134,7 +123,6 @@ Connection.prototype.save = function(cb) {
 				}.bind(this));
 			}.bind(this));
 		}
->>>>>>> 400870fd42fb1c071ac4538aac2cb5613824d412
 	}
 };
 
