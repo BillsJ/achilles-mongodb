@@ -88,6 +88,7 @@ Connection.prototype.save = function(cb) {
 		}.bind(this));
 	} else {
 		var str = "";
+<<<<<<< HEAD
 		var container = this;
 		new Containers();
 		var resp = {};
@@ -97,6 +98,43 @@ Connection.prototype.save = function(cb) {
 				cb(err, this);
 			});
 		}.bind(this));
+=======
+		if(this._id) {
+			var container = this;
+			while(container.container) {
+				if(container.container instanceof Array) {
+					str = container.container.indexOf(container) + (str ? "." + str : "");
+					container = container.container;
+				}
+				str = container.containerProp + (str ? "." + str : "");
+				container = container.container;
+			}
+			var resp = new Object();
+			resp[str] = this.toJSON();
+			container.constructor.collection.then(function(collection) {
+				collection.update({_id: new mongodb.ObjectID(container._id)}, {$set: resp}, function(err, doc) {
+					cb(err, this);
+				}.bind(this));
+			}.bind(this));
+		} else {
+			var container = this.container;
+			while(container.container) {
+				if(container.container instanceof Array) {
+					str = container.container.indexOf(container) + (str ? "." + str : "");
+					container = container.container;
+				}
+				str = container.containerProp + (str ? "." + str : "");
+				container = container.container;
+			}
+			var resp = new Object();
+			resp[str] = this.toJSON();
+			container.constructor.collection.then(function(collection) {
+				collection.update({_id: new mongodb.ObjectID(container._id)}, {$push: resp}, function(err, doc) {
+					cb(err, this);
+				}.bind(this));
+			}.bind(this));
+		}
+>>>>>>> 400870fd42fb1c071ac4538aac2cb5613824d412
 	}
 };
 
